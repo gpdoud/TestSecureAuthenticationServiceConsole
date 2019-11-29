@@ -12,20 +12,33 @@ namespace TestSecureAuthenticationServiceConsole {
         static readonly string baseUrl = "http://localhost:7015/api";
     
         static async Task Main(string[] args) {
+            var username = "sa";
+            var password = "sa";
+            var seckey = await Auth.RegenSecurityKey(username, password);
+            var token = await Auth.GetNewToken(seckey);
+            var isValid = await Auth.AuthToken(token);
+            Console.WriteLine($"{username}/{password} sk={seckey} t={token}");
+        }
+        static async Task Run() {
             {
-                // Insert()
+                // Insert(User user)
                 //var newUser = new User {
                 //    Id = 0, Username = "us", Password = "us", Name = "User", Active = true
                 //};
                 //var res = await Insert(newUser);
-                //Console.WriteLine($"Insert: {res}");
+                //Console.WriteLine($"INSERT: {res}");
             }
             {
-                // Update()
-                var user = await GetPk(3);
-                user.RegenSecurityKey();
-                var res = await Update(user);
-                Console.WriteLine($"Update: {res}");
+                // Update(User user)
+                //var user = await GetPk(3);
+                //user.RegenSecurityKey();
+                //var res = await Update(user);
+                //Console.WriteLine($"UPDATE: {res}");
+            }
+            {
+                // Delete(int id)
+                var res = await Delete(4);
+                Console.WriteLine($"DELETE: {res}");
             }
             {
                 // GetAll()
@@ -66,7 +79,11 @@ namespace TestSecureAuthenticationServiceConsole {
         static async Task<HttpResponseMessage> Update(User usr) {
             var userJson = JsonSerializer.Serialize<User>(usr);
             var content = new StringContent(userJson, System.Text.Encoding.Default, "application/json");
-            var res = await http.PutAsync($"{baseUrl}/users", content);
+            var res = await http.PutAsync($"{baseUrl}/users/{usr.Id}", content);
+            return res;
+        }
+        static async Task<HttpResponseMessage> Delete(int id) {
+            var res = await http.DeleteAsync($"{baseUrl}/users/{id}");
             return res;
         }
     }
