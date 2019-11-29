@@ -12,21 +12,34 @@ namespace TestSecureAuthenticationServiceConsole {
         static readonly string baseUrl = "http://localhost:7015/api";
     
         static async Task Main(string[] args) {
-            // GetAll()
-            var users = await GetAll();
-            Console.WriteLine("users: [");
-            foreach(var u in users)
-                Console.WriteLine($"  {u}");
-            Console.WriteLine("]");
-            // GetPk()
-            //var user = await GetPk(3);
-            //Console.WriteLine($"user: {user}");
-            // Insert()
-            //var newUser = new User {
-            //    Id = 0, Username = "us", Password = "us", Name = "User", Active = true
-            //};
-            //var res = await Insert(newUser);
-            //Console.WriteLine($"Insert: {res}");
+            {
+                // Insert()
+                //var newUser = new User {
+                //    Id = 0, Username = "us", Password = "us", Name = "User", Active = true
+                //};
+                //var res = await Insert(newUser);
+                //Console.WriteLine($"Insert: {res}");
+            }
+            {
+                // Update()
+                var user = await GetPk(3);
+                user.RegenSecurityKey();
+                var res = await Update(user);
+                Console.WriteLine($"Update: {res}");
+            }
+            {
+                // GetAll()
+                var users = await GetAll();
+                Console.WriteLine("users: [");
+                foreach(var u in users)
+                    Console.WriteLine($"  {u}");
+                Console.WriteLine("]");
+            }
+            {
+                // GetPk()
+                //var user = await GetPk(3);
+                //Console.WriteLine($"user: {user}");
+            }
         }
         static async Task<IEnumerable<User>> GetAll() {
             var res = await http.GetStringAsync($"{baseUrl}/users");
@@ -48,6 +61,12 @@ namespace TestSecureAuthenticationServiceConsole {
             var userJson = JsonSerializer.Serialize<User>(usr);
             var content = new StringContent(userJson, System.Text.Encoding.Default, "application/json");
             var res = await http.PostAsync($"{baseUrl}/users", content);
+            return res;
+        }
+        static async Task<HttpResponseMessage> Update(User usr) {
+            var userJson = JsonSerializer.Serialize<User>(usr);
+            var content = new StringContent(userJson, System.Text.Encoding.Default, "application/json");
+            var res = await http.PutAsync($"{baseUrl}/users", content);
             return res;
         }
     }
